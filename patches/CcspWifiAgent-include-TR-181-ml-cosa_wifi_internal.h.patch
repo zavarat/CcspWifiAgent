@@ -1,0 +1,10 @@
+--- ./CcspWifiAgent/include/TR-181/ml/cosa_wifi_internal.h
++++ ./CcspWifiAgent/include/TR-181/ml/cosa_wifi_internal.h	2015-04-22 14:22:31.190835008 -0600
+@@ -83,6 +83,7 @@
+  
+     PCOSA_DML_WIFI_AP_ASSOC_DEVICE  AssocDevices;
+     ULONG                           AssocDeviceCount;
++    ULONG			    AssociatedDevice1PreviousVisitTime;
+ }
+ COSA_DML_WIFI_AP, *PCOSA_DML_WIFI_AP;
+ 

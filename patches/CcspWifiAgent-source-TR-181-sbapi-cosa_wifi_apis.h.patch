@@ -1,0 +1,136 @@
+--- ./CcspWifiAgent/source/TR-181/sbapi/cosa_wifi_apis.h
++++ ./CcspWifiAgent/source/TR-181/sbapi/cosa_wifi_apis.h	2015-06-15 07:21:49.136339225 -0600
+@@ -221,6 +221,9 @@
+     int                             MCS;
+     int                             TransmitPower;
+     BOOLEAN                         IEEE80211hEnabled;
++    BOOLEAN			    X_COMCAST_COM_DFSEnable; 
++    BOOLEAN			    X_COMCAST_COM_IGMPSnoopingEnable; 
++    unsigned int                    X_COMCAST_COM_DFSSupport;
+     char                            RegulatoryDomain[4];
+     /* Below is Cisco Extensions */
+     COSA_DML_WIFI_BASICRATE         BasicRate;
+@@ -309,6 +312,11 @@
+     ULONG                           ErrorsReceived;
+     ULONG                           DiscardPacketsSent;
+     ULONG                           DiscardPacketsReceived;
++	ULONG                           PLCPErrorCount;
++    ULONG                           FCSErrorCount;
++    ULONG                           InvalidMACCount;
++    ULONG                           PacketsOtherReceived;
++	int                             Noise;
+ }_struct_pack_;
+ 
+ typedef  struct _COSA_DML_WIFI_RADIO_STATS COSA_DML_WIFI_RADIO_STATS, *PCOSA_DML_WIFI_RADIO_STATS;
+@@ -387,6 +395,12 @@
+     ULONG                           BroadcastPacketsSent;
+     ULONG                           BroadcastPacketsReceived;
+     ULONG                           UnknownProtoPacketsReceived;
++    ULONG                           RetransCount;
++    ULONG                           FailedRetransCount;
++    ULONG                           RetryCount;
++    ULONG                           MultipleRetryCount;
++    ULONG                           ACKFailureCount;
++    ULONG                           AggregatedPacketCount;
+ }_struct_pack_;
+ 
+ typedef  struct _COSA_DML_WIFI_SSID_STATS COSA_DML_WIFI_SSID_STATS, *PCOSA_DML_WIFI_SSID_STATS;
+@@ -434,8 +448,14 @@
+     BOOL                        BssCountStaAsCpe;
+     BOOL                        BssHotSpot;
+     ULONG                      LongRetryLimit;
++    ULONG                      MaxAssociatedDevices;
++    ULONG                      HighWatermarkThreshold;
++    ULONG                      HighWatermarkThresholdReached;
++    ULONG                      HighWatermark;
+     BOOLEAN                  KickAssocDevices;
+-
++    BOOLEAN                  InterworkingCapability;
++    BOOLEAN                  InterworkingEnable;
++    char 		     MacFilterMode[12];
+ }_struct_pack_;
+ 
+ typedef struct _COSA_DML_WIFI_AP_CFG COSA_DML_WIFI_AP_CFG,  *PCOSA_DML_WIFI_AP_CFG;
+@@ -625,6 +645,9 @@
+        void
+     );
+     
++ANSC_STATUS CosaDmlWiFi_FactoryResetRadioAndAp(ULONG radioIndex, ULONG radioIndex_2, ULONG apIndex, ULONG apIndex_2);
++ANSC_STATUS CosaDmlWiFiFactoryResetRadioAndAp (ULONG radioIndex, ULONG apIndex, BOOL needRestart);
++
+ ANSC_STATUS
+ CosaDmlWiFi_ResetRadios
+     (
+@@ -918,6 +941,22 @@
+     );
+ 
+ ANSC_STATUS
++CosaDmlWiFiApAssociatedDevicesHighWatermarkGetVal
++    (
++        ANSC_HANDLE                 hContext,
++        char*                       pSsid,
++        PCOSA_DML_WIFI_AP_CFG       pCfg
++    );
++
++ANSC_STATUS
++CosaDmlGetHighWatermarkDate
++    (
++       ANSC_HANDLE                 hContext,
++       char*                       pSsid,
++       char                       *pDate
++    );
++
++ANSC_STATUS
+ CosaDmlWiFiApSecGetEntry
+     (
+         ANSC_HANDLE                 hContext,
+@@ -1172,4 +1211,49 @@
+ ANSC_STATUS
+ CosaDmlWiFi_SetConfigFile(const void *buf, int size);
+ 
++ANSC_STATUS 
++CosaDmlWiFi_RadioUpTime(int *TimeInSecs, int radioIndex);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioCarrierSenseThresholdRange(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioCarrierSenseThresholdInUse(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_setRadioCarrierSenseThresholdInUse(INT radioIndex, INT threshold);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioBeaconPeriod(INT radioIndex, UINT *output);
++ANSC_STATUS 
++CosaDmlWiFi_setRadioBeaconPeriod(INT radioIndex, UINT BeaconPeriod);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioBasicDataTransmitRates(INT radioIndex, ULONG *output);
++ANSC_STATUS 
++CosaDmlWiFi_setRadioBasicDataTransmitRates(INT radioIndex,ULONG val);
++
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsChannelUtilization(INT radioIndex, ULONG *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsActivityFactor(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsCarrierSenseThreshold_Exceeded(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsRetransmissionMetirc(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsMaximumNoiseFloorOnChannel(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsMinimumNoiseFloorOnChannel(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsMedianNoiseFloorOnChannel(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsRadioStatisticsMeasuringRate(INT radioIndex, INT *output);
++ANSC_STATUS 
++CosaDmlWiFi_setRadioStatsRadioStatisticsMeasuringRate(INT radioIndex, INT rate);
++ANSC_STATUS 
++CosaDmlWiFi_setRadioStatsRadioStatisticsMeasuringInterval(INT radioIndex, INT rate);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsRadioStatisticsMeasuringInterval(INT radioIndex, INT *output);
++/*ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsStatisticsStartTime(INT radioIndex, INT *timeInSeconds);*/
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsStatisticsStartTime(INT radioIndex, char* pValue);
++ANSC_STATUS 
++CosaDmlWiFi_getRadioStatsReceivedSignalLevel(INT radioIndex, INT signalIndex, INT *SignalLevel);
+ #endif
